@@ -9,6 +9,7 @@ const config = {
   importOrder: [
     '<THIRD_PARTY_MODULES>',
     'actions',
+    'data',
     'schemas',
     'lib',
     'component',
