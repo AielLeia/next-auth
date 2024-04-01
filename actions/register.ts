@@ -1,8 +1,9 @@
 'use server';
 
-import { getUserByEmail } from '@/data/user';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
+
+import { getUserByEmail } from '@/data/user';
 
 import { RegisterSchema } from '@/schemas';
 
