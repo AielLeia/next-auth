@@ -1,5 +1,6 @@
-import { cn } from '@/lib/utils';
 import { Poppins } from 'next/font/google';
+
+import { cn } from '@/lib/utils';
 
 import LoginButton from '@/components/auth/login-button';
 import { Button } from '@/components/ui/button';
