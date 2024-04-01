@@ -13,7 +13,11 @@ export const publicRoutes: string[] = ['/'];
  * @constant authRoutes
  * @type {string[]}
  */
-export const authRoutes: string[] = ['/auth/login', '/auth/register'];
+export const authRoutes: string[] = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/error',
+];
 
 /**
  * Defines the prefix for API authentication routes.
