@@ -34,9 +34,9 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     );
     const currentDate = getCurrentDateWithDst();
     const isVerificationTokenInvalid =
-      existingVerificationToken &&
-      existingVerificationToken.expires &&
-      existingVerificationToken.expires <= currentDate;
+      !existingVerificationToken ||
+      !existingVerificationToken.expires ||
+      existingVerificationToken.expires > currentDate;
 
     if (isVerificationTokenInvalid) {
       const verificationToken = await generateVerificationToken(email);

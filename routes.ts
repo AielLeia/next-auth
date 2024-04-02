@@ -4,7 +4,7 @@
  * @constant publicRoutes
  * @type {string[]}
  */
-export const publicRoutes: string[] = ['/'];
+export const publicRoutes: string[] = ['/', '/auth/new-verification'];
 
 /**
  * Represents an array of routes that are used for authenticating users.
