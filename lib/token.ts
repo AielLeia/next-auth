@@ -1,6 +1,8 @@
+import crypto from 'node:crypto';
 import { v4 as uuidv4 } from 'uuid';
 
 import { getPasswordResetTokenByEmail } from '@/data/password-reset-token';
+import { getTwoFactorTokenByEmail } from '@/data/two-factor-token';
 import { getVerificationTokenByEmail } from '@/data/verification-token';
 
 import { getCurrentTimeWithOneHour } from '@/lib/date';
@@ -48,6 +50,31 @@ export const generatePasswordResetToken = async ({
   }
 
   return db.passwordResetToken.create({
+    data: {
+      email,
+      token,
+      expires,
+    },
+  });
+};
+
+/**
+ * Generates a two-factor authentication token for a given email.
+ *
+ * @param {string} email - The email address to generate the token for.
+ */
+export const generateTwoFactorToken = async ({ email }: { email: string }) => {
+  const token = crypto.randomInt(100_000, 1_000_000).toString();
+  const expires = getCurrentTimeWithOneHour();
+
+  const existingTwoFactorToken = await getTwoFactorTokenByEmail({ email });
+  if (existingTwoFactorToken) {
+    await db.twoFactorToken.delete({
+      where: { id: existingTwoFactorToken.id },
+    });
+  }
+
+  return db.twoFactorToken.create({
     data: {
       email,
       token,

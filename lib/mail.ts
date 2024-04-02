@@ -3,6 +3,29 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
+ * Sends a two-factor authentication token email to the specified email address.
+ *
+ * @param email - The email address to send the token to.
+ * @param token - The two-factor authentication token.
+ */
+export const sendTwoFactorTokenEmail = async ({
+  email,
+  token,
+}: {
+  email: string;
+  token: string;
+}) => {
+  await resend.emails.send({
+    from: 'onboarding@resend.dev',
+    to: email,
+    subject: '2FA Code',
+    html: `
+     <p>Your 2FA Code: ${token}</p>
+    `,
+  });
+};
+
+/**
  * Sends a password reset email to the specified email address.
  *
  * @param email - The email address to send the password reset email to.

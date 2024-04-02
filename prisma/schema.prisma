@@ -20,25 +20,29 @@ enum UserRole {
 /// Model representing a User in the database.
 ///
 /// Attributes:
-/// - id: String, the unique identifier for the User.
-/// - name: String, the name of the User.
-/// - email: String, the email address of the User (must be unique).
-/// - emailVerified: DateTime, the date and time when the email was verified.
-/// - image: String, the URL of the User's profile image.
-/// - password: String, the hashed password of the User.
-/// - role: UserRole, the role of the User (default is USER).
-/// - accounts: List of Account objects associated with the User.
+/// - id: The unique identifier for the User.
+/// - name: The name of the User.
+/// - email: The email address of the User (unique).
+/// - emailVerified: The date and time when the email was verified.
+/// - image: The URL of the User's profile image.
+/// - password: The hashed password of the User.
+/// - role: The role of the User (default: USER).
+/// - accounts: The list of associated Account objects.
+/// - isTwoFactorEnabled: Indicates if two-factor authentication is enabled for the User (default: false).
+/// - twoFactorConfirmation: The associated TwoFactorConfirmation object.
 ///
 /// Note: This model is used to store user information in the database.
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          UserRole  @default(USER)
-  accounts      Account[]
+  id                    String                 @id @default(cuid())
+  name                  String?
+  email                 String?                @unique
+  emailVerified         DateTime?
+  image                 String?
+  password              String?
+  role                  UserRole               @default(USER)
+  accounts              Account[]
+  isTwoFactorEnabled    Boolean                @default(false)
+  twoFactorConfirmation TwoFactorConfirmation?
 }
 
 /// Model representing an Account in the database.
@@ -120,4 +124,45 @@ model PasswordResetToken {
 
   @@unique([email, token])
   @@index([email])
+}
+
+/// Model representing a TwoFactorToken in the database.
+///
+/// Attributes:
+/// - id: The unique identifier for the TwoFactorToken.
+/// - email: The email associated with the TwoFactorToken.
+/// - token: The unique token value for the TwoFactorToken.
+/// - expires: The expiration date and time of the TwoFactorToken.
+///
+/// Constraints:
+/// - The combination of email and token must be unique.
+model TwoFactorToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+  @@index([email])
+}
+
+/// Model TwoFactorConfirmation represents a confirmation for two-factor authentication for a user.
+///
+/// Attributes:
+/// - id: String (required) - The unique identifier for the two-factor confirmation.
+/// - userId: String (required) - The ID of the user associated with the two-factor confirmation.
+/// - user: User (required) - The user associated with the two-factor confirmation.
+///
+/// Constraints:
+/// - The userId attribute must be unique.
+///
+/// Relations:
+/// - The user attribute is a relation to the User model, referencing the id attribute of the User model.
+/// - When a user is deleted, the associated two-factor confirmation will be deleted as well (onDelete: Cascade).
+model TwoFactorConfirmation {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
 }
