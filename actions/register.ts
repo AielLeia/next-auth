@@ -8,15 +8,9 @@ import { getUserByEmail } from '@/data/user';
 import { RegisterSchema } from '@/schemas';
 
 import db from '@/lib/db';
+import { sendVerificationEmail } from '@/lib/mail';
+import { generateVerificationToken } from '@/lib/token';
 
-/**
- * Registers a new user with the provided information.
- *
- * @param values - The user information to register.
- * @returns An object indicating the success or failure of the registration.
- *          If successful, the object will contain a 'success' property.
- *          If unsuccessful, the object will contain an 'error' property with the corresponding error message.
- */
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values);
 
@@ -41,7 +35,12 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     },
   });
 
-  // TODO: Send verification token email
+  const verificationToken = await generateVerificationToken(email);
 
-  return { success: 'User created' };
+  await sendVerificationEmail({
+    email: verificationToken.email,
+    token: verificationToken.token,
+  });
+
+  return { success: 'Confirmation email sent' };
 };
