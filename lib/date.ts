@@ -25,3 +25,15 @@ export const getCurrentDateWithDst = (): Date => {
 
   return currentDate.plus({ hour: 1 }).toJSDate();
 };
+
+/**
+ * Returns the current time adjusted for daylight saving time (DST) in the Europe/Paris timezone,
+ * with an additional 5 minutes.
+ *
+ * @returns {Date} The current time with DST adjustment and 5 minutes added.
+ */
+export const getCurrentTimeWithFiveMinute = (): Date => {
+  return DateTime.fromJSDate(getCurrentDateWithDst())
+    .plus({ minutes: 5 })
+    .toJSDate();
+};

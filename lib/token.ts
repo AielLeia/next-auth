@@ -5,7 +5,10 @@ import { getPasswordResetTokenByEmail } from '@/data/password-reset-token';
 import { getTwoFactorTokenByEmail } from '@/data/two-factor-token';
 import { getVerificationTokenByEmail } from '@/data/verification-token';
 
-import { getCurrentTimeWithOneHour } from '@/lib/date';
+import {
+  getCurrentTimeWithFiveMinute,
+  getCurrentTimeWithOneHour,
+} from '@/lib/date';
 import db from '@/lib/db';
 
 /**
@@ -65,7 +68,7 @@ export const generatePasswordResetToken = async ({
  */
 export const generateTwoFactorToken = async ({ email }: { email: string }) => {
   const token = crypto.randomInt(100_000, 1_000_000).toString();
-  const expires = getCurrentTimeWithOneHour();
+  const expires = getCurrentTimeWithFiveMinute();
 
   const existingTwoFactorToken = await getTwoFactorTokenByEmail({ email });
   if (existingTwoFactorToken) {

@@ -12,6 +12,7 @@ const config = {
     'data',
     'schemas',
     'lib',
+    'hooks',
     'component',
   ],
   importOrderSeparation: true,
