@@ -9,17 +9,21 @@ import { getUserById } from '@/data/user';
 
 import db from '@/lib/db';
 
+export type ExtendedUser = {
+  role: UserRole;
+  isTwoFactorEnable: boolean;
+} & DefaultSession['user'];
+
 declare module 'next-auth' {
   interface Session {
-    user: {
-      role: UserRole;
-    } & DefaultSession['user'];
+    user: ExtendedUser;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     role: UserRole;
+    isTwoFactorEnable: boolean;
   }
 }
 
@@ -76,6 +80,10 @@ export const {
         session.user.role = token.role;
       }
 
+      if (token.isTwoFactorEnable && session.user) {
+        session.user.isTwoFactorEnable = token.isTwoFactorEnable;
+      }
+
       return session;
     },
     async jwt({ token }) {
@@ -88,6 +96,7 @@ export const {
       if (!existingUser) return token;
 
       token.role = existingUser.role;
+      token.isTwoFactorEnable = existingUser.isTwoFactorEnabled;
 
       return token;
     },
