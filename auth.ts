@@ -4,6 +4,7 @@ import { UserRole } from '@prisma/client';
 import NextAuth, { DefaultSession } from 'next-auth';
 import { DefaultJWT } from 'next-auth/jwt';
 
+import { getAccountByUserId } from '@/data/account';
 import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation';
 import { getUserById } from '@/data/user';
 
@@ -12,6 +13,7 @@ import db from '@/lib/db';
 export type ExtendedUser = {
   role: UserRole;
   isTwoFactorEnable: boolean;
+  isOAuth: boolean;
 } & DefaultSession['user'];
 
 declare module 'next-auth' {
@@ -23,7 +25,10 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     role: UserRole;
+    name: string | null | undefined;
+    email: string | null | undefined;
     isTwoFactorEnable: boolean;
+    isOAuth: boolean;
   }
 }
 
@@ -84,6 +89,12 @@ export const {
         session.user.isTwoFactorEnable = token.isTwoFactorEnable;
       }
 
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.email = token.email!;
+        session.user.isOAuth = token.isOAuth;
+      }
+
       return session;
     },
     async jwt({ token }) {
@@ -95,6 +106,13 @@ export const {
 
       if (!existingUser) return token;
 
+      const existingAccount = await getAccountByUserId({
+        userId: existingUser.id,
+      });
+
+      token.isOAuth = !!existingAccount;
+      token.name = existingUser.name;
+      token.email = existingUser.email;
       token.role = existingUser.role;
       token.isTwoFactorEnable = existingUser.isTwoFactorEnabled;
 
